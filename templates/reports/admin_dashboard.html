@@ -1,0 +1,378 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Admin Dashboard - Student Report System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h2>
+    <div>
+        <a href="{% url 'reports:all_reports' %}" class="btn btn-primary me-2">
+            <i class="fas fa-list me-2"></i>All Reports
+        </a>
+        <a href="{% url 'reports:user_management' %}" class="btn btn-success me-2">
+            <i class="fas fa-users me-2"></i>User Management
+        </a>
+        <a href="{% url 'reports:admin_add_evaluator' %}" class="btn btn-info me-2">
+            <i class="fas fa-user-plus me-2"></i>Add Evaluator
+        </a>
+        <a href="{% url 'reports:admin_assign_students' %}" class="btn btn-warning me-2">
+            <i class="fas fa-user-check me-2"></i>Assign Students
+        </a>
+        <a href="/admin/" class="btn btn-secondary">
+            <i class="fas fa-cog me-2"></i>Django Admin
+        </a>
+    </div>
+</div>
+
+<!-- Advanced Filtering -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="card-title mb-0">
+            <i class="fas fa-filter me-2"></i>Advanced Filtering & Management
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Filter Reports</label>
+                <div class="btn-group w-100" role="group">
+                    <a href="?filter=all" class="btn {% if filter_type == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">All</a>
+                    <a href="?filter=recent" class="btn {% if filter_type == 'recent' %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">Recent</a>
+                    <a href="?filter=pending" class="btn {% if filter_type == 'pending' %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">Pending</a>
+                    <a href="?filter=approved" class="btn {% if filter_type == 'approved' %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">Approved</a>
+                    <a href="?filter=needs_update" class="btn {% if filter_type == 'needs_update' %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">Needs Update</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">By Evaluator</label>
+                <select class="form-select form-select-sm" onchange="filterByEvaluator(this.value)">
+                    <option value="">All Evaluators</option>
+                    {% for evaluator in evaluator_stats %}
+                        <option value="{{ evaluator.id }}" {% if evaluator_filter == evaluator.id|stringformat:"s" %}selected{% endif %}>
+                            {{ evaluator.get_full_name|default:evaluator.username }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">By Status</label>
+                <select class="form-select form-select-sm" onchange="filterByStatus(this.value)">
+                    <option value="">All Statuses</option>
+                    <option value="submitted" {% if status_filter == 'submitted' %}selected{% endif %}>Submitted</option>
+                    <option value="under_review" {% if status_filter == 'under_review' %}selected{% endif %}>Under Review</option>
+                    <option value="evaluated" {% if status_filter == 'evaluated' %}selected{% endif %}>Evaluated</option>
+                    <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">By Department</label>
+                <select class="form-select form-select-sm" onchange="filterByDepartment(this.value)">
+                    <option value="">All Departments</option>
+                    {% for dept in dept_stats %}
+                        <option value="{{ dept.department }}" {% if department_filter == dept.department %}selected{% endif %}>
+                            {{ dept.department }} ({{ dept.count }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Batch</label>
+                <input type="text" class="form-control form-control-sm" placeholder="e.g. 2024" value="{{ batch_filter|default:'' }}" onkeydown="if(event.key==='Enter'){filterByBatch(this.value)}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Student</label>
+                <input type="text" class="form-control form-control-sm" placeholder="Name or username" value="{{ student_filter|default:'' }}" onkeydown="if(event.key==='Enter'){filterByStudent(this.value)}">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_reports }}</h4>
+                        <p class="card-text">Total Reports</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-file-alt fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_students }}</h4>
+                        <p class="card-text">Students</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-user-graduate fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ total_evaluators }}</h4>
+                        <p class="card-text">Evaluators</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chalkboard-teacher fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ recent_reports|length }}</h4>
+                        <p class="card-text">Recent Reports</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Filtered Reports -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    {% if filter_type == 'recent' %}Recent Reports
+                    {% elif filter_type == 'pending' %}Pending Reports
+                    {% elif filter_type == 'approved' %}Approved Reports
+                    {% elif filter_type == 'needs_update' %}Reports Needing Update
+                    {% else %}All Reports{% endif %}
+                    <span class="badge bg-primary ms-2">{{ filtered_reports|length }}</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if filtered_reports %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Student</th>
+                                    <th>Department</th>
+                                    <th>Batch</th>
+                                    <th>Status</th>
+                                    <th>Evaluators</th>
+                                    <th>Submitted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in filtered_reports %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ report.title }}</strong>
+                                        {% if report.supervisor %}
+                                            <br><small class="text-muted">Supervisor: {{ report.supervisor }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ report.student.get_full_name|default:report.student.username }}</td>
+                                    <td>{{ report.department }}</td>
+                                    <td>{{ report.batch }}</td>
+                                    <td>
+                                        {% if report.status == 'submitted' %}
+                                            <span class="badge bg-secondary">Submitted</span>
+                                        {% elif report.status == 'under_review' %}
+                                            <span class="badge bg-warning">Under Review</span>
+                                        {% elif report.status == 'evaluated' %}
+                                            <span class="badge bg-success">Evaluated</span>
+                                        {% elif report.status == 'rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if report.assignments.exists %}
+                                            <span class="badge bg-info">{{ report.assignments.count }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">0</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ report.submitted_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'reports:report_detail' report.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'reports:assign_evaluator' report.id %}" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-user-plus"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No reports found</h5>
+                        <p class="text-muted">Try adjusting your filter criteria.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="col-lg-4">
+        <!-- Department Statistics -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Reports by Department
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if dept_stats %}
+                    {% for stat in dept_stats %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>{{ stat.department }}</span>
+                        <span class="badge bg-primary">{{ stat.count }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No data available</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Status Statistics -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Reports by Status
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if status_stats %}
+                    {% for stat in status_stats %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>{{ stat.status|title }}</span>
+                        <span class="badge 
+                            {% if stat.status == 'submitted' %}bg-secondary
+                            {% elif stat.status == 'under_review' %}bg-warning
+                            {% elif stat.status == 'evaluated' %}bg-success
+                            {% elif stat.status == 'rejected' %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {{ stat.count }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No data available</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Evaluator Statistics -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-users me-2"></i>Evaluator Performance
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if evaluator_stats %}
+                    {% for evaluator in evaluator_stats %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong>{{ evaluator.get_full_name|default:evaluator.username }}</strong>
+                        </div>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <small class="text-muted">Assigned</small><br>
+                                <span class="badge bg-info">{{ evaluator.assigned_count }}</span>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Evaluated</small><br>
+                                <span class="badge bg-success">{{ evaluator.evaluated_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No evaluators found</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterByEvaluator(evaluatorId) {
+    const url = new URL(window.location);
+    if (evaluatorId) {
+        url.searchParams.set('evaluator', evaluatorId);
+    } else {
+        url.searchParams.delete('evaluator');
+    }
+    window.location.href = url.toString();
+}
+
+function filterByStatus(status) {
+    const url = new URL(window.location);
+    if (status) {
+        url.searchParams.set('status', status);
+    } else {
+        url.searchParams.delete('status');
+    }
+    window.location.href = url.toString();
+}
+
+function filterByDepartment(department) {
+    const url = new URL(window.location);
+    if (department) {
+        url.searchParams.set('department', department);
+    } else {
+        url.searchParams.delete('department');
+    }
+    window.location.href = url.toString();
+}
+
+function filterByBatch(batch) {
+    const url = new URL(window.location);
+    if (batch) {
+        url.searchParams.set('batch', batch);
+    } else {
+        url.searchParams.delete('batch');
+    }
+    window.location.href = url.toString();
+}
+
+function filterByStudent(student) {
+    const url = new URL(window.location);
+    if (student) {
+        url.searchParams.set('student', student);
+    } else {
+        url.searchParams.delete('student');
+    }
+    window.location.href = url.toString();
+}
+</script>
+{% endblock %}

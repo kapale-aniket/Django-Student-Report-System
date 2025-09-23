@@ -1,0 +1,3 @@
+This is a sample project report for demonstration purposes.
+It contains information about a student project.
+The report demonstrates the file upload functionality.

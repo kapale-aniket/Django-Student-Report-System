@@ -1,0 +1,139 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Welcome - Student Report System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="text-center mb-5 animate-fade-in">
+            <div class="animate-pulse-soft" style="display:inline-block">
+                <h1 class="display-4 text-primary mb-2">
+                    <i class="fas fa-graduation-cap"></i> Student Report System
+                </h1>
+            </div>
+            <p class="lead text-muted animate-slide-up">A comprehensive platform for project report submission and evaluation</p>
+        </div>
+
+        <!-- Role-based Login -->
+        <div class="row justify-content-center mt-3 animate-fade-in-delayed">
+            <div class="col-md-8 col-lg-7">
+                <div class="card shadow hover-raise">
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <h3 class="text-primary">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </h3>
+                            <p class="text-muted">Choose your role and enter credentials</p>
+                        </div>
+
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                <label class="form-label">Select Role</label>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-outline-primary flex-fill" onclick="selectRole('admin')"><i class="fas fa-user-shield me-2"></i>Admin</button>
+                                    <button type="button" class="btn btn-outline-success flex-fill" onclick="selectRole('evaluator')"><i class="fas fa-chalkboard-teacher me-2"></i>Evaluator</button>
+                                    <button type="button" class="btn btn-outline-info flex-fill" onclick="selectRole('student')"><i class="fas fa-user-graduate me-2"></i>Student</button>
+                                </div>
+                                <input type="hidden" name="selected_role" id="selected_role" value="">
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="username" class="form-label">Username</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control" name="username" id="username" placeholder="Enter username" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="password" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        <input type="password" class="form-control" name="password" id="password" placeholder="Enter password" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info mt-3 mb-0 small" id="role_hint" style="display:none"></div>
+
+                            <div class="d-grid mt-3">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5 animate-fade-in">
+            <div class="col-12">
+                <h4 class="text-center mb-4">Key Features</h4>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="d-flex hover-raise">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-upload text-primary fa-lg"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6>Secure File Upload</h6>
+                                <p class="text-muted mb-0">Upload project reports in various formats (PDF, DOC, DOCX)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex hover-raise">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-comments text-success fa-lg"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6>Feedback System</h6>
+                                <p class="text-muted mb-0">Receive detailed feedback and grades from evaluators</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex hover-raise">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-filter text-info fa-lg"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6>Advanced Filtering</h6>
+                                <p class="text-muted mb-0">Filter reports by department, batch, and status</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex hover-raise">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-chart-line text-warning fa-lg"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6>Progress Tracking</h6>
+                                <p class="text-muted mb-0">Track evaluation progress and statistics</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function selectRole(role) {
+    const input = document.getElementById('selected_role');
+    const hint = document.getElementById('role_hint');
+    input.value = role;
+    let msg = '';
+    if (role === 'admin') msg = 'Logging in as Admin. You will be redirected to Admin Dashboard after successful login.';
+    if (role === 'evaluator') msg = 'Logging in as Evaluator. You will see assigned reports and can submit feedback.';
+    if (role === 'student') msg = 'Logging in as Student. You can submit reports and view feedback.';
+    hint.textContent = msg;
+    hint.style.display = 'block';
+}
+</script>
+{% endblock %}

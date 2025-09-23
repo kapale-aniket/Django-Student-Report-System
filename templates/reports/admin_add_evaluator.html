@@ -1,0 +1,27 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Add Evaluator{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0"><i class="fas fa-user-plus me-2"></i>Add Evaluator</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <div class="d-grid">
+            <button type="submit" class="btn btn-success">Create Evaluator</button>
+          </div>
+          <small class="text-muted d-block mt-2">Default password: demo123</small>
+        </form>
+      </div>
+    </div>
+  </div>
+  </div>
+{% endblock %}
+
+
