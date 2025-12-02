@@ -3,6 +3,13 @@ import os
 import sys
 import django
 
+# Configure PyMySQL to work with Django (for MySQL connection)
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass  # PyMySQL not installed, use default MySQLdb
+
 # Setup Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'student_report_system.settings')
 django.setup()

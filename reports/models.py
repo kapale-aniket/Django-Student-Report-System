@@ -1,14 +1,28 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
 import os
+import uuid
 
 User = get_user_model()
 
 
+def validate_file_size(value):
+    """Validate file size - max 5MB"""
+    max_size = 5 * 1024 * 1024  # 5MB in bytes
+    if value.size > max_size:
+        raise ValidationError(f'File size must be less than 5MB. Current size: {value.size / (1024 * 1024):.2f}MB')
+
+
 def upload_to_reports(instance, filename):
-    """Generate upload path for report files"""
-    return f'reports/{instance.student.department}/{instance.batch}/{filename}'
+    """Generate upload path with UUID-based unique filename"""
+    # Get file extension
+    ext = filename.split('.')[-1]
+    # Generate UUID filename
+    uuid_filename = f"{uuid.uuid4()}.{ext}"
+    # Store original filename in uuid_name field will be handled in save method
+    return f'reports/{uuid_filename}'
 
 
 class ProjectReport(models.Model):
@@ -29,12 +43,28 @@ class ProjectReport(models.Model):
     supervisor = models.CharField(max_length=100, blank=True, null=True)
     report_file = models.FileField(
         upload_to=upload_to_reports,
-        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx', 'txt'])],
-        help_text="Upload PDF, DOC, DOCX, or TXT files only"
+        validators=[
+            FileExtensionValidator(allowed_extensions=['pdf', 'docx', 'xlsx']),
+            validate_file_size
+        ],
+        help_text="Upload PDF, DOCX, or XLSX files only (Max size: 5MB)"
     )
+    uuid_name = models.CharField(max_length=255, blank=True, help_text="Unique UUID-based filename")
+    original_filename = models.CharField(max_length=255, blank=True, help_text="Original filename uploaded by user")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='submitted')
     submitted_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        """Override save to set uuid_name from filename"""
+        if self.report_file:
+            if not self.uuid_name:
+                # Extract UUID filename from report_file name
+                self.uuid_name = os.path.basename(self.report_file.name)
+            # Store original filename if provided
+            if hasattr(self, '_original_filename') and self._original_filename and not self.original_filename:
+                self.original_filename = self._original_filename
+        super().save(*args, **kwargs)
     
     class Meta:
         ordering = ['-submitted_at']
@@ -46,7 +76,13 @@ class ProjectReport(models.Model):
     
     @property
     def filename(self):
-        return os.path.basename(self.report_file.name)
+        """Return the original filename for display"""
+        return self.original_filename or os.path.basename(self.report_file.name) if self.report_file else None
+    
+    @property
+    def stored_filename(self):
+        """Return the UUID-based stored filename"""
+        return self.uuid_name or (os.path.basename(self.report_file.name) if self.report_file else None)
     
     @property
     def file_size(self):

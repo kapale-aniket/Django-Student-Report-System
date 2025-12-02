@@ -3,18 +3,25 @@
 {% block title %}User Management - Student Report System{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="fas fa-users me-2"></i>User Management</h2>
-    <a href="{% url 'reports:all_reports' %}" class="btn btn-primary">
-        <i class="fas fa-list me-2"></i>All Reports
-    </a>
-    <a href="{% url 'reports:admin_add_evaluator' %}" class="btn btn-success">
-        <i class="fas fa-user-plus me-2"></i>Add Evaluator
-    </a>
-    <a href="{% url 'reports:admin_assign_students' %}" class="btn btn-warning">
-        <i class="fas fa-user-check me-2"></i>Assign Students to Evaluator
-    </a>
-</div>
+<div class="container-fluid px-4 py-3">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 animate-fade-in">
+        <div>
+            <h2 class="mb-1"><i class="fas fa-users-cog me-2 text-primary"></i>User Management</h2>
+            <p class="text-muted mb-0">Manage all users, evaluators, and students in the system</p>
+        </div>
+        <div class="btn-group" role="group">
+            <a href="{% url 'reports:all_reports' %}" class="btn btn-outline-primary">
+                <i class="fas fa-list me-2"></i>All Reports
+            </a>
+            <a href="{% url 'reports:admin_add_evaluator' %}" class="btn btn-success">
+                <i class="fas fa-user-plus me-2"></i>Add Evaluator
+            </a>
+            <a href="{% url 'reports:admin_assign_students' %}" class="btn btn-warning">
+                <i class="fas fa-user-check me-2"></i>Assign Students
+            </a>
+        </div>
+    </div>
 
 <!-- Filter Options -->
 <div class="card mb-4">
@@ -57,17 +64,17 @@
     <div class="card-body">
         {% if page_obj %}
             <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
                         <tr>
-                            <th>User</th>
-                            <th>Role</th>
-                            <th>Department</th>
-                            <th>Batch</th>
-                            <th>Student ID</th>
-                            <th>Joined</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th style="width: 25%">User</th>
+                            <th style="width: 10%">Role</th>
+                            <th style="width: 12%">Department</th>
+                            <th style="width: 10%">Batch</th>
+                            <th style="width: 10%">Student ID</th>
+                            <th style="width: 12%">Joined</th>
+                            <th style="width: 8%">Status</th>
+                            <th style="width: 13%" class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -106,13 +113,14 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <div class="btn-group" role="group">
-                                    <a href="/admin/accounts/user/{{ user_obj.id }}/change/" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
+                                <div class="d-flex justify-content-center gap-2">
                                     {% if user_obj.role == 'student' %}
-                                        <a href="{% url 'reports:all_reports' %}?student={{ user_obj.username }}" class="btn btn-sm btn-outline-info">
+                                        <a href="{% url 'reports:all_reports' %}?student={{ user_obj.username }}" class="btn btn-sm btn-outline-info" title="View Reports" data-bs-toggle="tooltip">
                                             <i class="fas fa-file-alt"></i>
+                                        </a>
+                                    {% elif user_obj.role == 'evaluator' %}
+                                        <a href="{% url 'reports:admin_delete_evaluator' user_obj.id %}" class="btn btn-sm btn-outline-danger" title="Delete Evaluator" data-bs-toggle="tooltip">
+                                            <i class="fas fa-trash-alt"></i>
                                         </a>
                                     {% endif %}
                                 </div>
@@ -162,4 +170,15 @@
         {% endif %}
     </div>
 </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+</script>
 {% endblock %}

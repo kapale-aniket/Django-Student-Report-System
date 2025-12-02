@@ -10,48 +10,48 @@
     </a>
 </div>
 
-<!-- Statistics Cards -->
+<!-- Statistics Cards with Animations -->
 <div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card bg-primary text-white">
+    <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="100">
+        <div class="card hover-raise hover-glow" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;">
             <div class="card-body">
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h4 class="card-title">{{ total_reports }}</h4>
-                        <p class="card-text">Total Reports</p>
+                        <h2 class="card-title mb-1 animate-pulse-soft">{{ total_reports }}</h2>
+                        <p class="card-text mb-0">Total Reports</p>
                     </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-file-alt fa-2x"></i>
+                    <div class="align-self-center animate-float">
+                        <i class="fas fa-file-alt fa-3x opacity-75"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card bg-success text-white">
+    <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="200">
+        <div class="card hover-raise hover-glow" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border: none; color: white;">
             <div class="card-body">
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h4 class="card-title">{{ evaluated_reports }}</h4>
-                        <p class="card-text">Evaluated</p>
+                        <h2 class="card-title mb-1 animate-pulse-soft">{{ evaluated_reports }}</h2>
+                        <p class="card-text mb-0">Evaluated</p>
                     </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-check-circle fa-2x"></i>
+                    <div class="align-self-center animate-float">
+                        <i class="fas fa-check-circle fa-3x opacity-75"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card bg-warning text-white">
+    <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="300">
+        <div class="card hover-raise hover-glow" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none; color: white;">
             <div class="card-body">
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h4 class="card-title">{{ pending_reports }}</h4>
-                        <p class="card-text">Pending</p>
+                        <h2 class="card-title mb-1 animate-pulse-soft">{{ pending_reports }}</h2>
+                        <p class="card-text mb-0">Pending</p>
                     </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-clock fa-2x"></i>
+                    <div class="align-self-center animate-float">
+                        <i class="fas fa-clock fa-3x opacity-75"></i>
                     </div>
                 </div>
             </div>
@@ -60,8 +60,8 @@
 </div>
 
 <!-- Reports List -->
-<div class="card">
-    <div class="card-header">
+<div class="card hover-raise" data-aos="fade-up" data-aos-delay="400">
+    <div class="card-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
         <h5 class="card-title mb-0">
             <i class="fas fa-list me-2"></i>My Submitted Reports
         </h5>
@@ -70,7 +70,7 @@
         {% if reports %}
             <div class="table-responsive">
                 <table class="table table-hover">
-                    <thead>
+                    <thead class="table-light">
                         <tr>
                             <th>Title</th>
                             <th>Department</th>
@@ -82,7 +82,7 @@
                     </thead>
                     <tbody>
                         {% for report in reports %}
-                        <tr>
+                        <tr data-aos="fade-right" data-aos-delay="{{ forloop.counter0|add:100 }}">
                             <td>
                                 <strong>{{ report.title }}</strong>
                                 {% if report.supervisor %}
@@ -93,22 +93,22 @@
                             <td>{{ report.batch }}</td>
                             <td>
                                 {% if report.status == 'submitted' %}
-                                    <span class="badge bg-secondary">Submitted</span>
+                                    <span class="badge bg-secondary status-badge">Submitted</span>
                                 {% elif report.status == 'under_review' %}
-                                    <span class="badge bg-warning">Under Review</span>
+                                    <span class="badge bg-warning status-badge animate-pulse-soft">Under Review</span>
                                 {% elif report.status == 'evaluated' %}
-                                    <span class="badge bg-success">Evaluated</span>
+                                    <span class="badge bg-success status-badge">Evaluated</span>
                                 {% elif report.status == 'rejected' %}
-                                    <span class="badge bg-danger">Rejected</span>
+                                    <span class="badge bg-danger status-badge">Rejected</span>
                                 {% endif %}
                             </td>
                             <td>{{ report.submitted_at|date:"M d, Y" }}</td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <a href="{% url 'reports:view_report' report.id %}" class="btn btn-sm btn-outline-primary">
+                                    <a href="{% url 'reports:view_report' report.id %}" class="btn btn-sm btn-outline-primary hover-scale">
                                         <i class="fas fa-eye"></i> View
                                     </a>
-                                    <a href="{% url 'reports:download_report' report.id %}" class="btn btn-sm btn-outline-secondary">
+                                    <a href="{% url 'reports:download_report' report.id %}" class="btn btn-sm btn-outline-secondary hover-scale">
                                         <i class="fas fa-download"></i>
                                     </a>
                                 </div>
@@ -131,32 +131,33 @@
     </div>
 </div>
 
+{% block extra_js %}
 <script>
-// Auto-refresh dashboard every 30 seconds to show status updates
-setInterval(function() {
-    location.reload();
-}, 30000);
-
-// Add visual feedback for status changes
+// Smooth table row animations
 document.addEventListener('DOMContentLoaded', function() {
-    const statusBadges = document.querySelectorAll('.badge');
-    statusBadges.forEach(badge => {
-        if (badge.textContent.trim() === 'Under Review') {
-            badge.classList.add('pulse-animation');
-        }
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach((row, index) => {
+        row.style.opacity = '0';
+        row.style.transform = 'translateX(-20px)';
+        setTimeout(() => {
+            row.style.transition = 'all 0.5s ease';
+            row.style.opacity = '1';
+            row.style.transform = 'translateX(0)';
+        }, index * 100);
+    });
+    
+    // Add hover effect to table rows
+    rows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.01)';
+            this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+        });
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = 'none';
+        });
     });
 });
 </script>
-
-<style>
-.pulse-animation {
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-}
-</style>
+{% endblock %}
 {% endblock %}

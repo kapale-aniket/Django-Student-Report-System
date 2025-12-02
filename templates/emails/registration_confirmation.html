@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #4f46e5;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin: -30px -30px 20px -30px;
+        }
+        .info {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-left: 4px solid #2196F3;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Student Report System</h1>
+        </div>
+        
+        <p>Hello {{ first_name }},</p>
+        
+        <p>Thank you for registering as a student in our system!</p>
+        
+        <div class="info">
+            <strong>Your Registration Status:</strong><br>
+            Your account has been created with username: <strong>{{ username }}</strong><br>
+            Your account is currently <strong>pending approval</strong> from an evaluator.
+        </div>
+        
+        <p>You will receive another email notification once your account has been approved and activated. At that time, you will be able to log in and start submitting your project reports.</p>
+        
+        <p>If you have any questions or need assistance, please contact the administrator.</p>
+        
+        <div class="footer">
+            <p>This is an automated message from the Student Report System.</p>
+            <p>© {{ year }} Student Report System. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+

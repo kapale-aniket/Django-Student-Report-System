@@ -16,6 +16,20 @@ class User(AbstractUser):
     department = models.CharField(max_length=100, blank=True, null=True)
     batch = models.CharField(max_length=20, blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
+    
+    # Approval status for self-registered students
+    APPROVAL_CHOICES = [
+        ('pending', 'Pending Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    approval_status = models.CharField(max_length=20, choices=APPROVAL_CHOICES, default='approved', 
+                                      help_text='For students: pending approval from evaluator')
+    approved_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, 
+                                   related_name='approved_students',
+                                   help_text='Evaluator who approved this student')
+    approval_date = models.DateTimeField(null=True, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

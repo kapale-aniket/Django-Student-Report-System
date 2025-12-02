@@ -3,6 +3,12 @@
 import os
 import sys
 
+# Configure PyMySQL to work with Django (for MySQL connection)
+try:
+    import pymysql
+    pymysql.install_as_MySQLdb()
+except ImportError:
+    pass  # PyMySQL not installed, use default MySQLdb
 
 def main():
     """Run administrative tasks."""

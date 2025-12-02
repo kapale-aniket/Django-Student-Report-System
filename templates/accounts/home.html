@@ -1,119 +1,211 @@
-{% extends 'base/base.html' %}
-
-{% block title %}Welcome - Student Report System{% endblock %}
-
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="text-center mb-5 animate-fade-in">
-            <div class="animate-pulse-soft" style="display:inline-block">
-                <h1 class="display-4 text-primary mb-2">
-                    <i class="fas fa-graduation-cap"></i> Student Report System
-                </h1>
-            </div>
-            <p class="lead text-muted animate-slide-up">A comprehensive platform for project report submission and evaluation</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Welcome - Student Report System</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border: none;
+            border-radius: 10px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.8s ease forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    {% if messages %}
+        <div class="position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 9999;">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
         </div>
+    {% endif %}
 
-        <!-- Role-based Login -->
-        <div class="row justify-content-center mt-3 animate-fade-in-delayed">
-            <div class="col-md-8 col-lg-7">
-                <div class="card shadow hover-raise">
-                    <div class="card-body p-4">
-                        <div class="text-center mb-4">
-                            <h3 class="text-primary">
-                                <i class="fas fa-sign-in-alt"></i> Login
-                            </h3>
-                            <p class="text-muted">Choose your role and enter credentials</p>
+    <div class="login-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5 animate-fade-in">
+                    <h1 class="display-4 text-primary mb-2">
+                        <i class="fas fa-graduation-cap"></i> Student Report System
+                    </h1>
+                    <p class="lead text-muted">A comprehensive platform for project report submission and evaluation</p>
+                </div>
+
+                <!-- Login Form -->
+                <div class="row justify-content-center animate-fade-in">
+                    <div class="col-md-6 col-lg-5">
+                        <div class="card shadow">
+                            <div class="card-body p-5">
+                                <div class="text-center mb-4">
+                                    <h3 class="text-primary">
+                                        <i class="fas fa-sign-in-alt"></i> Login
+                                    </h3>
+                                    <p class="text-muted">Sign in to your account</p>
+                                </div>
+
+                                <form method="post">
+                                    {% csrf_token %}
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-user"></i>
+                                            </span>
+                                            <input type="text" class="form-control" name="username" id="{{ form.username.id_for_label }}" 
+                                                   placeholder="Enter your username" required autofocus>
+                                        </div>
+                                        {% if form.username.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {% for error in form.username.errors %}
+                                                    <div>{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-lock"></i>
+                                            </span>
+                                            <input type="password" class="form-control" name="password" id="{{ form.password.id_for_label }}" 
+                                                   placeholder="Enter your password" required>
+                                        </div>
+                                        {% if form.password.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {% for error in form.password.errors %}
+                                                    <div>{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if form.non_field_errors %}
+                                        <div class="alert alert-danger">
+                                            {% for error in form.non_field_errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <hr class="my-4">
+                                
+                                <div class="text-center">
+                                    <p class="text-muted mb-2">New Student?</p>
+                                    <a href="{% url 'accounts:student_register' %}" class="btn btn-outline-success">
+                                        <i class="fas fa-user-plus me-2"></i>Register as Student
+                                    </a>
+                                    <p class="text-muted small mt-2 mb-0">Student accounts require evaluator approval</p>
+                                </div>
+                            </div>
                         </div>
-
-                        <form method="post">
-                            {% csrf_token %}
-
-                            <div class="mb-3">
-                                <label class="form-label">Select Role</label>
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-outline-primary flex-fill" onclick="selectRole('admin')"><i class="fas fa-user-shield me-2"></i>Admin</button>
-                                    <button type="button" class="btn btn-outline-success flex-fill" onclick="selectRole('evaluator')"><i class="fas fa-chalkboard-teacher me-2"></i>Evaluator</button>
-                                    <button type="button" class="btn btn-outline-info flex-fill" onclick="selectRole('student')"><i class="fas fa-user-graduate me-2"></i>Student</button>
-                                </div>
-                                <input type="hidden" name="selected_role" id="selected_role" value="">
-                            </div>
-
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="username" class="form-label">Username</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                        <input type="text" class="form-control" name="username" id="username" placeholder="Enter username" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="password" class="form-label">Password</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                        <input type="password" class="form-control" name="password" id="password" placeholder="Enter password" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="alert alert-info mt-3 mb-0 small" id="role_hint" style="display:none"></div>
-
-                            <div class="d-grid mt-3">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-sign-in-alt me-2"></i>Login
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="row mt-5 animate-fade-in">
-            <div class="col-12">
-                <h4 class="text-center mb-4">Key Features</h4>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <div class="d-flex hover-raise">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-upload text-primary fa-lg"></i>
+                <div class="row mt-5 animate-fade-in">
+                    <div class="col-12">
+                        <h4 class="text-center mb-4">Key Features</h4>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-upload text-primary fa-lg"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6>Secure File Upload</h6>
+                                        <p class="text-muted mb-0">Upload project reports in various formats (PDF, DOCX, XLSX)</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6>Secure File Upload</h6>
-                                <p class="text-muted mb-0">Upload project reports in various formats (PDF, DOC, DOCX)</p>
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-comments text-success fa-lg"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6>Feedback System</h6>
+                                        <p class="text-muted mb-0">Receive detailed feedback and grades from evaluators</p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="d-flex hover-raise">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-comments text-success fa-lg"></i>
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-filter text-info fa-lg"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6>Advanced Filtering</h6>
+                                        <p class="text-muted mb-0">Filter reports by department, batch, and status</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6>Feedback System</h6>
-                                <p class="text-muted mb-0">Receive detailed feedback and grades from evaluators</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="d-flex hover-raise">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-filter text-info fa-lg"></i>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6>Advanced Filtering</h6>
-                                <p class="text-muted mb-0">Filter reports by department, batch, and status</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="d-flex hover-raise">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-chart-line text-warning fa-lg"></i>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h6>Progress Tracking</h6>
-                                <p class="text-muted mb-0">Track evaluation progress and statistics</p>
+                            <div class="col-md-6">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-chart-line text-warning fa-lg"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <h6>Progress Tracking</h6>
+                                        <p class="text-muted mb-0">Track evaluation progress and statistics</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -121,19 +213,48 @@
             </div>
         </div>
     </div>
-</div>
 
-<script>
-function selectRole(role) {
-    const input = document.getElementById('selected_role');
-    const hint = document.getElementById('role_hint');
-    input.value = role;
-    let msg = '';
-    if (role === 'admin') msg = 'Logging in as Admin. You will be redirected to Admin Dashboard after successful login.';
-    if (role === 'evaluator') msg = 'Logging in as Evaluator. You will see assigned reports and can submit feedback.';
-    if (role === 'student') msg = 'Logging in as Student. You can submit reports and view feedback.';
-    hint.textContent = msg;
-    hint.style.display = 'block';
-}
-</script>
-{% endblock %}
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Force fresh page load - prevent browser cache
+        (function() {
+            // Clear any stale session data
+            if (typeof(Storage) !== "undefined") {
+                // Clear sessionStorage
+                try {
+                    sessionStorage.clear();
+                } catch(e) {}
+            }
+            
+            // Prevent back button cache
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    // Page was loaded from cache, force reload
+                    window.location.reload();
+                }
+            });
+            
+            // Clear cookies if user lands on login page (should not be authenticated)
+            // This ensures stale cookies don't cause redirects
+            document.addEventListener('DOMContentLoaded', function() {
+                // If we're on the home page and there's a session cookie, clear it
+                if (window.location.pathname === '/' || window.location.pathname === '') {
+                    // The server-side view already handles clearing, but this is extra safety
+                    console.log('Home page loaded - ensuring fresh state');
+                }
+            });
+            
+            // Add timestamp to prevent caching
+            const timestamp = new Date().getTime();
+            const links = document.querySelectorAll('link[rel="stylesheet"]');
+            links.forEach(function(link) {
+                if (!link.href.includes('?')) {
+                    link.href += '?v=' + timestamp;
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

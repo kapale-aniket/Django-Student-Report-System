@@ -22,8 +22,14 @@ urlpatterns = [
     path('users/', views.user_management, name='user_management'),
     path('users/add-evaluator/', views.admin_add_evaluator, name='admin_add_evaluator'),
     path('users/assign-students/', views.admin_assign_students, name='admin_assign_students'),
+    path('users/evaluator/<int:evaluator_id>/delete/', views.admin_delete_evaluator, name='admin_delete_evaluator'),
 
     # Evaluator functions
     path('students/add/', views.evaluator_add_student, name='evaluator_add_student'),
+    path('students/list/', views.evaluator_view_students, name='evaluator_view_students'),
+    path('students/pending/', views.pending_students, name='pending_students'),
+    path('students/<int:student_id>/approve/', views.approve_student, name='approve_student'),
+    path('students/<int:student_id>/reject/', views.reject_student, name='reject_student'),
+    path('students/<int:student_id>/delete/', views.evaluator_delete_student, name='evaluator_delete_student'),
 ]
 
