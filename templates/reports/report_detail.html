@@ -1,0 +1,212 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{{ report.title }} - Student Report System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-file-alt me-2"></i>{{ report.title }}</h2>
+    <div>
+        {% if report.status == 'submitted' %}
+            <span class="badge bg-secondary fs-6">Submitted</span>
+        {% elif report.status == 'under_review' %}
+            <span class="badge bg-warning fs-6">Under Review</span>
+        {% elif report.status == 'evaluated' %}
+            <span class="badge bg-success fs-6">Evaluated</span>
+        {% elif report.status == 'rejected' %}
+            <span class="badge bg-danger fs-6">Rejected</span>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Report Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Report Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>Student:</strong>
+                            <p class="text-muted mb-0">{{ report.student.get_full_name|default:report.student.username }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Department:</strong>
+                            <p class="text-muted mb-0">{{ report.department }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Batch:</strong>
+                            <p class="text-muted mb-0">{{ report.batch }}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        {% if report.supervisor %}
+                        <div class="mb-3">
+                            <strong>Supervisor:</strong>
+                            <p class="text-muted mb-0">{{ report.supervisor }}</p>
+                        </div>
+                        {% endif %}
+                        <div class="mb-3">
+                            <strong>Submitted:</strong>
+                            <p class="text-muted mb-0">{{ report.submitted_at|date:"F d, Y g:i A" }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Last Updated:</strong>
+                            <p class="text-muted mb-0">{{ report.updated_at|date:"F d, Y g:i A" }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if report.description %}
+                <hr>
+                <div class="mb-3">
+                    <strong>Description:</strong>
+                    <p class="text-muted">{{ report.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- File Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-file me-2"></i>Report File
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="me-3">
+                        {% if report.filename|slice:"-4:" == ".pdf" %}
+                            <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                        {% elif report.filename|slice:"-4:" == ".doc" or report.filename|slice:"-5:" == ".docx" %}
+                            <i class="fas fa-file-word fa-3x text-primary"></i>
+                        {% else %}
+                            <i class="fas fa-file-alt fa-3x text-secondary"></i>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ report.filename }}</h6>
+                        <p class="text-muted mb-0">Size: {{ report.file_size }}</p>
+                    </div>
+                    <div>
+                        <a href="{% url 'reports:view_report' report.id %}" class="btn btn-primary" target="_blank">
+                            <i class="fas fa-download me-2"></i>Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Section -->
+        {% if feedbacks %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-comments me-2"></i>Feedback & Evaluation
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for feedback in feedbacks %}
+                <div class="border-start border-4 border-primary ps-3 mb-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="mb-1">{{ feedback.evaluator.get_full_name|default:feedback.evaluator.username }}</h6>
+                            <small class="text-muted">{{ feedback.created_at|date:"F d, Y g:i A" }}</small>
+                        </div>
+                        {% if feedback.grade %}
+                        <div class="text-end">
+                            <span class="badge bg-success fs-6">{{ feedback.grade }}/{{ feedback.max_grade }}</span>
+                            <br>
+                            <small class="text-muted">{{ feedback.grade_percentage|floatformat:1 }}%</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <p class="mb-0">{{ feedback.comments|linebreaks }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-cogs me-2"></i>Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if user.is_evaluator and not user_feedback %}
+                    <a href="{% url 'reports:give_feedback' report.id %}" class="btn btn-success w-100 mb-2">
+                        <i class="fas fa-comment me-2"></i>Give Feedback
+                    </a>
+                {% elif user.is_evaluator and user_feedback %}
+                    <a href="{% url 'reports:give_feedback' report.id %}" class="btn btn-outline-success w-100 mb-2">
+                        <i class="fas fa-edit me-2"></i>Edit Feedback
+                    </a>
+                {% endif %}
+                
+                {% if user.is_admin %}
+                    <a href="{% url 'reports:assign_evaluator' report.id %}" class="btn btn-warning w-100 mb-2">
+                        <i class="fas fa-user-plus me-2"></i>Assign Evaluator
+                    </a>
+                {% endif %}
+                
+                <a href="{% url 'reports:view_report' report.id %}" class="btn btn-outline-primary w-100 mb-2" target="_blank">
+                    <i class="fas fa-eye me-2"></i>View Report
+                </a>
+                
+                {% if user.is_student %}
+                    <a href="{% url 'reports:student_dashboard' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                {% elif user.is_evaluator %}
+                    <a href="{% url 'reports:evaluator_dashboard' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                {% elif user.is_admin %}
+                    <a href="{% url 'reports:all_reports' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Reports
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Assigned Evaluators -->
+        {% if report.assignments.exists %}
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-users me-2"></i>Assigned Evaluators
+                </h6>
+            </div>
+            <div class="card-body">
+                {% for assignment in report.assignments.all %}
+                    {% if assignment.is_active %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <strong>{{ assignment.evaluator.get_full_name|default:assignment.evaluator.username }}</strong>
+                            <br>
+                            <small class="text-muted">Assigned {{ assignment.assigned_at|date:"M d, Y" }}</small>
+                        </div>
+                        {% if assignment.evaluator.id in evaluated_evaluator_ids %}
+                            <span class="badge bg-success">Evaluated</span>
+                        {% else %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

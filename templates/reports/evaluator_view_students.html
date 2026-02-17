@@ -1,0 +1,111 @@
+{% extends 'base/base.html' %}
+
+{% block title %}My Students - Student Report System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-user-graduate me-2"></i>My Assigned Students</h2>
+    <div>
+        <a href="{% url 'reports:evaluator_dashboard' %}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+        <a href="{% url 'reports:evaluator_add_student' %}" class="btn btn-success">
+            <i class="fas fa-user-plus me-2"></i>Add Student
+        </a>
+    </div>
+</div>
+
+{% if students_with_reports %}
+<div class="card hover-raise" data-aos="fade-up">
+    <div class="card-header" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; border: none;">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-list me-2"></i>Assigned Students
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Student</th>
+                        <th>Student ID</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Batch</th>
+                        <th>Reports Count</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in students_with_reports %}
+                    <tr data-aos="fade-right" data-aos-delay="{{ forloop.counter0|add:100 }}">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <strong>{{ item.student.get_full_name|default:item.student.username }}</strong>
+                                    <br>
+                                    <small class="text-muted">@{{ item.student.username }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ item.student.student_id|default:"—" }}</td>
+                        <td>{{ item.student.email|default:"—" }}</td>
+                        <td>{{ item.student.department|default:"—" }}</td>
+                        <td>{{ item.student.batch|default:"—" }}</td>
+                        <td>
+                            <span class="badge bg-info">{{ item.reports_count }} report{{ item.reports_count|pluralize }}</span>
+                        </td>
+                        <td>
+                            {% if item.student.is_active %}
+                                {% if item.student.approval_status == 'approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif item.student.approval_status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% elif item.student.approval_status == 'rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'reports:all_reports' %}?student={{ item.student.username }}" class="btn btn-sm btn-outline-primary" title="View Reports">
+                                    <i class="fas fa-file-alt"></i>
+                                </a>
+                                <a href="{% url 'reports:evaluator_delete_student' item.student.id %}" class="btn btn-sm btn-outline-danger" title="Delete Student" onclick="return confirm('Are you sure you want to delete this student? This action cannot be undone and will delete all associated reports.');">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card hover-raise" data-aos="fade-up">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-user-graduate fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">No Students Assigned</h5>
+        <p class="text-muted">You don't have any students assigned to you yet.</p>
+        <a href="{% url 'reports:evaluator_add_student' %}" class="btn btn-primary">
+            <i class="fas fa-user-plus me-2"></i>Add Your First Student
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+
+
+
+
+
+

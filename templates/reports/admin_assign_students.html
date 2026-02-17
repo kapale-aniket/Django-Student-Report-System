@@ -1,0 +1,33 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Assign Students to Evaluator{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0"><i class="fas fa-user-check me-2"></i>Assign Students to Evaluator</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Evaluator</label>
+            {{ form.evaluator }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Students</label>
+            {{ form.students }}
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-warning">Assign Selected Students</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
