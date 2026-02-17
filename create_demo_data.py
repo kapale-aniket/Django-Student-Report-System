@@ -20,7 +20,7 @@ from reports.models import ProjectReport, ReportAssignment
 def create_demo_users():
     """Create demo users for testing"""
     
-    # Create demo student
+    # Create demo student (always set password so login works after re-run)
     student, created = User.objects.get_or_create(
         username='student1',
         defaults={
@@ -32,14 +32,16 @@ def create_demo_users():
             'department': 'Computer Science',
             'batch': '2024',
             'phone_number': '1234567890',
-            'is_active': True
+            'is_active': True,
+            'approval_status': 'approved',
         }
     )
-    if created:
-        student.set_password('demo123')
-        student.save()
-        print("Created demo student: student1")
-    
+    student.set_password('demo123')
+    student.is_active = True
+    student.approval_status = 'approved'
+    student.save()
+    print("Created demo student: student1" if created else "Updated demo student: student1")
+
     # Create demo evaluator
     evaluator, created = User.objects.get_or_create(
         username='evaluator1',
@@ -50,14 +52,14 @@ def create_demo_users():
             'role': 'evaluator',
             'department': 'Computer Science',
             'phone_number': '0987654321',
-            'is_active': True
+            'is_active': True,
         }
     )
-    if created:
-        evaluator.set_password('demo123')
-        evaluator.save()
-        print("Created demo evaluator: evaluator1")
-    
+    evaluator.set_password('demo123')
+    evaluator.is_active = True
+    evaluator.save()
+    print("Created demo evaluator: evaluator1" if created else "Updated demo evaluator: evaluator1")
+
     # Create demo admin
     admin, created = User.objects.get_or_create(
         username='admin1',
@@ -68,13 +70,15 @@ def create_demo_users():
             'role': 'admin',
             'is_staff': True,
             'is_superuser': True,
-            'is_active': True
+            'is_active': True,
         }
     )
-    if created:
-        admin.set_password('demo123')
-        admin.save()
-        print("Created demo admin: admin1")
+    admin.set_password('demo123')
+    admin.is_staff = True
+    admin.is_superuser = True
+    admin.is_active = True
+    admin.save()
+    print("Created demo admin: admin1" if created else "Updated demo admin: admin1")
     
     return student, evaluator, admin
 

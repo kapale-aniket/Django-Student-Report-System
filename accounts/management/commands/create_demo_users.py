@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write('Creating demo users and data...')
         
-        # Create demo student
+        # Create demo student (always set password so login works after re-run)
         student, created = User.objects.get_or_create(
             username='student1',
             defaults={
@@ -22,14 +22,15 @@ class Command(BaseCommand):
                 'department': 'Computer Science',
                 'batch': '2024',
                 'phone_number': '1234567890',
-                'is_active': True
+                'is_active': True,
             }
         )
-        if created:
-            student.set_password('demo123')
-            student.save()
-            self.stdout.write(self.style.SUCCESS('Created demo student: student1'))
-        
+        student.set_password('demo123')
+        student.is_active = True
+        student.approval_status = 'approved'
+        student.save()
+        self.stdout.write(self.style.SUCCESS('Created demo student: student1' if created else 'Updated demo student: student1'))
+
         # Create demo evaluator
         evaluator, created = User.objects.get_or_create(
             username='evaluator1',
@@ -43,11 +44,11 @@ class Command(BaseCommand):
                 'is_active': True
             }
         )
-        if created:
-            evaluator.set_password('demo123')
-            evaluator.save()
-            self.stdout.write(self.style.SUCCESS('Created demo evaluator: evaluator1'))
-        
+        evaluator.set_password('demo123')
+        evaluator.is_active = True
+        evaluator.save()
+        self.stdout.write(self.style.SUCCESS('Created demo evaluator: evaluator1' if created else 'Updated demo evaluator: evaluator1'))
+
         # Create demo admin
         admin, created = User.objects.get_or_create(
             username='admin1',
@@ -61,10 +62,12 @@ class Command(BaseCommand):
                 'is_active': True
             }
         )
-        if created:
-            admin.set_password('demo123')
-            admin.save()
-            self.stdout.write(self.style.SUCCESS('Created demo admin: admin1'))
+        admin.set_password('demo123')
+        admin.is_staff = True
+        admin.is_superuser = True
+        admin.is_active = True
+        admin.save()
+        self.stdout.write(self.style.SUCCESS('Created demo admin: admin1' if created else 'Updated demo admin: admin1'))
         
         # Create sample report file
         media_dir = 'media/reports/Computer Science/2024'
